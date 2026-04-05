@@ -83,59 +83,55 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Load news data
-    let newsJsonPath = 'data/news.json';
-    if (window.location.pathname.includes('/pages/')) {
-        newsJsonPath = '../data/news.json';
+    const homepageNewsContainer = document.getElementById('news-container');
+    const allNewsContainer = document.getElementById('all-news-container');
+
+    if (homepageNewsContainer || allNewsContainer) {
+        let newsJsonPath = 'data/news.json';
+        if (window.location.pathname.includes('/pages/')) {
+            newsJsonPath = '../data/news.json';
+        }
+        
+        fetch(newsJsonPath)
+            .then(response => response.json())
+            .then(data => {
+                if (homepageNewsContainer) {
+                    renderNewsItems(data.slice(0, 8), 'news-container');
+                }
+                
+                if (allNewsContainer) {
+                    renderNewsItems(data, 'all-news-container');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading news data:', error);
+            });
     }
     
-    fetch(newsJsonPath)
-        .then(response => response.json())
-        .then(data => {
-            // Check if we're on the homepage
-            const latestNewsSection = document.getElementById('latest-news');
-            if (latestNewsSection) {
-                // On homepage - show limited news (first 8 items)
-                renderNewsItems(data.slice(0, 8), 'news-container');
-            }
-            
-            // Check if we're on the all-news page
-            const allNewsSection = document.getElementById('all-news');
-            if (allNewsSection) {
-                // On all-news page - show all news items
-                renderNewsItems(data, 'all-news-container');
-            }
-        })
-        .catch(error => {
-            console.error('Error loading news data:', error);
-        });
-    
-    // Load honors data
-    let honorsJsonPath = 'data/honors.json';
-    if (window.location.pathname.includes('/pages/')) {
-        honorsJsonPath = '../data/honors.json';
+    const homepageHonorsContainer = document.getElementById('honors-container');
+    const allHonorsContainer = document.getElementById('all-honors-container');
+
+    if (homepageHonorsContainer || allHonorsContainer) {
+        let honorsJsonPath = 'data/honors.json';
+        if (window.location.pathname.includes('/pages/')) {
+            honorsJsonPath = '../data/honors.json';
+        }
+        
+        fetch(honorsJsonPath)
+            .then(response => response.json())
+            .then(data => {
+                if (homepageHonorsContainer) {
+                    renderHonorsItems(data.slice(0, 8), 'honors-container');
+                }
+                
+                if (allHonorsContainer) {
+                    renderHonorsItems(data, 'all-honors-container');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading honors data:', error);
+            });
     }
-    
-    fetch(honorsJsonPath)
-        .then(response => response.json())
-        .then(data => {
-            // Check if we're on the homepage
-            const honorsSection = document.getElementById('honors');
-            if (honorsSection) {
-                // On homepage - show limited honors (first 8 items)
-                renderHonorsItems(data.slice(0, 8), 'honors-container');
-            }
-            
-            // Check if we're on the all-honors page
-            const allHonorsSection = document.getElementById('all-honors');
-            if (allHonorsSection) {
-                // On all-honors page - show all honors items
-                renderHonorsItems(data, 'all-honors-container');
-            }
-        })
-        .catch(error => {
-            console.error('Error loading honors data:', error);
-        });
 });
 
 // Function to load publications from JSON
@@ -147,7 +143,6 @@ function loadPublications() {
 
     const publicationsList = document.querySelector('.publications-list');
     if (!publicationsList) {
-        console.warn('Publications list not found');
         return;
     }
     
