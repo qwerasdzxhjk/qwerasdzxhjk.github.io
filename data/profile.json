@@ -1,0 +1,66 @@
+{
+  "name": "Taochang Liu",
+  "role": "Master's student",
+  "affiliation": "Guangzhou University",
+  "location": "Guangzhou, China",
+  "email": "liutc@e.gzhu.edu.cn",
+  "avatar": "assets/Taochang.jpg",
+  "description": "Taochang Liu researches generative modeling, multimodal learning, and structured remote sensing image segmentation at Guangzhou University.",
+  "translations": {
+    "zh": {
+      "role": "硕士研究生",
+      "affiliation": "广州大学",
+      "location": "中国，广州",
+      "description": "Taochang Liu，广州大学硕士研究生，研究方向为生成式建模、多模态学习与遥感影像结构化分割。"
+    }
+  },
+  "advisors": [
+    { "name": "Xinchang Zhang", "title": "Prof.", "url": "http://www.sysuzxc.site" },
+    { "name": "Ji Qi", "title": "Dr." }
+  ],
+  "links": {
+    "github": "https://github.com/qwerasdzxhjk",
+    "orcid": "https://orcid.org/0009-0002-7399-3907"
+  },
+  "address": ["B3 806", "Guangzhou University", "Guangzhou, China"],
+  "research": [
+    {
+      "title": "Generative Modeling",
+      "label": "FLOW / DIFFUSION",
+      "description": "Exploring flow matching and diffusion models for image generation and structured segmentation.",
+      "translations": { "zh": { "title": "生成式建模", "description": "探索流匹配与扩散模型在图像生成和结构化分割中的应用。" } }
+    },
+    {
+      "title": "Multimodal Learning",
+      "label": "ALIGN / GENERATE",
+      "description": "Learning from complementary modalities to support image generation and scene understanding.",
+      "translations": { "zh": { "title": "多模态学习", "description": "利用互补模态开展学习，支持图像生成与场景理解。" } }
+    },
+    {
+      "title": "Remote Sensing",
+      "label": "SCENE / STRUCTURE",
+      "description": "Understanding buildings, roads, and other regular man-made objects in high-resolution imagery.",
+      "translations": { "zh": { "title": "遥感影像分析", "description": "理解高分辨率影像中的建筑、道路及其他规则人造地物。" } }
+    }
+  ],
+  "education": [
+    {
+      "start": "2024",
+      "end": "Present",
+      "university": "Guangzhou University",
+      "logo": "assets/education/guangzhou-university.jpg",
+      "degree": "M.S. in Surveying and Mapping Engineering",
+      "note": "In progress",
+      "translations": { "zh": { "end": "至今", "university": "广州大学", "degree": "测绘工程 硕士研究生", "note": "在读" } }
+    },
+    {
+      "start": "2019",
+      "end": "2023",
+      "university": "Northeast Agricultural University",
+      "logo": "assets/education/northeast-agricultural-university.png",
+      "degree": "B.E. in Land Consolidation Engineering",
+      "note": "",
+      "translations": { "zh": { "university": "东北农业大学", "degree": "土地整治工程 工学学士" } }
+    }
+  ]
+}

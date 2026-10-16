@@ -1,14 +1,12 @@
 [
   {
-    "date": "2025-01-01",
-    "content": "Welcome to my new academic homepage! This template is available on GitHub.",
+    "date": "2026-10-07",
+    "content": "Our paper, RegularFlow, has been accepted by IEEE Geoscience and Remote Sensing Letters.",
+    "translations": {
+      "zh": { "content": "我们的论文 RegularFlow 已被 IEEE Geoscience and Remote Sensing Letters 接收。" }
+    },
     "links": [
-        { "text": "GitHub", "url": "https://github.com/yihangtao/AcaNova-X" }
+      { "text": "IEEE Xplore", "url": "https://ieeexplore.ieee.org/document/11733487" }
     ]
-  },
-  {
-     "date": "2024-12-15",
-     "content": "One paper titled 'A Novel Approach to AI' was accepted to CVPR 2025!",
-     "links": []
   }
 ]

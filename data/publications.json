@@ -1,26 +1,46 @@
 [
   {
-    "title": "AcaNova-X: A Modern and Elegant Academic Website Template",
-    "authors": "<strong>Your Name</strong>, Collaborator A, Collaborator B",
-    "venue": "CVPR 2025",
-    "year": "2025",
-    "highlight": "Oral",
-    "thumbnail": "assets/publications/placeholder/paper-thumb.png",
+    "title": "RegularFlow: A Deterministic Flow-Matching Framework for Segmenting Regular Man-Made Objects in Remote Sensing Images",
+    "authors": [
+      "Taochang Liu",
+      "Ji Qi",
+      "Yibing Xiong",
+      "Hui Gong",
+      "Xinchang Zhang",
+      "Zihan Jiang"
+    ],
+    "venue": "IEEE GRSL",
+    "type": "journal",
+    "year": "2026",
+    "publicationDate": "2026-10-12",
+    "status": "Early Access",
+    "doi": "10.1109/LGRS.2026.3741864",
+    "showOnHomepage": true,
+    "highlight": "",
+    "badges": [
+      "First Author"
+    ],
+    "thumbnail": "assets/publications/regularflow.png",
+    "thumbnailAlt": "Overview of the RegularFlow deterministic flow-matching framework and its body-boundary collaborative structural constraint.",
+    "summary": "A deterministic flow-matching approach that combines body and boundary guidance for structurally consistent road and building segmentation.",
+    "abstract": "Roads, buildings, and other regular man-made objects in high-resolution remote sensing images provide essential cues for urban spatial analysis and updates of fundamental geospatial information. However, existing semantic segmentation methods still struggle to preserve boundary regularity and morphological completeness in complex scenes. To address this problem, this paper proposes RegularFlow, a deterministic flow-matching framework for segmenting regular man-made objects in remote sensing images. RegularFlow models the transformation from a remote sensing image to the target mask as a deterministic transport process in latent space and uses a Diffusion Transformer to learn the conditional velocity field. It further introduces a body-boundary collaborative structural constraint, in which body and boundary structure branches guide feature evolution from the complementary perspectives of region completeness and contour regularity, thereby improving the ability of the model to capture the geometric morphology of regular man-made objects. Experiments on the DeepGlobe road dataset and the HaLoBuilding dataset for building extraction demonstrate that RegularFlow achieves the best BF1 on DeepGlobe, HaLo_H, and HaLo_L and competitive or best performance on the remaining metrics. Compared with the second-best method on each task, RegularFlow achieves relative BF1 improvements of 2.50%, 2.32%, and 3.05% on DeepGlobe, HaLo_H, and HaLo_L, respectively, and relative BIoU improvements of 5.10% and 1.75% on DeepGlobe and HaLo_H. Qualitative results further demonstrate that RegularFlow effectively preserves topological continuity and boundary regularity and exhibits strong cross-category adaptability. This study offers a deterministic generative modeling perspective for structured semantic segmentation of regular man-made objects in high-resolution remote sensing images. Code is available at https://github.com/qwerasdzxhjk/RegularFlow.",
     "tags": [
-      { "text": "Paper", "link": "#" },
-      { "text": "Code", "link": "#" },
-      { "text": "Project Page", "link": "#" }
-    ]
-  },
-  {
-    "title": "Another Great Research Work on Machine Learning",
-    "authors": "Collaborator A, <strong>Your Name</strong>, Collaborator B",
-    "venue": "NeurIPS 2024",
-    "year": "2024",
-    "highlight": "Spotlight",
-    "thumbnail": "",
-    "tags": [
-      { "text": "Paper", "link": "#" }
-    ]
+      {
+        "text": "Paper",
+        "link": "https://ieeexplore.ieee.org/document/11733487"
+      },
+      {
+        "text": "Code",
+        "link": "https://github.com/qwerasdzxhjk/RegularFlow"
+      }
+    ],
+    "id": "regularflow2026",
+    "translations": {
+      "zh": {
+        "thumbnailAlt": "RegularFlow 确定性流匹配框架及主体-边界协同结构约束示意图。",
+        "abstract": "高分辨率遥感影像中的道路、建筑等规则人造地物，为城市空间分析和基础地理信息更新提供了重要线索。然而，现有语义分割方法在复杂场景中仍难以保持边界规整性与形态完整性。为此，本文提出 RegularFlow，一种面向遥感影像中规则人造地物分割的确定性流匹配框架。RegularFlow 将遥感影像到目标掩膜的变换建模为潜空间中的确定性输运过程，并利用扩散 Transformer 学习条件速度场。框架进一步引入主体-边界协同结构约束，通过主体与边界结构分支，从区域完整性和轮廓规整性两个互补角度引导特征演化，提升模型对规则人造地物几何形态的刻画能力。在 DeepGlobe 道路数据集与 HaLoBuilding 建筑提取数据集上的实验表明，RegularFlow 在 DeepGlobe、HaLo_H 和 HaLo_L 上均取得最优 BF1，在其余指标上也达到最优或具有竞争力的表现。相较于各任务中排名第二的方法，RegularFlow 在上述三个任务上的 BF1 分别相对提升 2.50%、2.32% 和 3.05%，在 DeepGlobe 和 HaLo_H 上的 BIoU 分别相对提升 5.10% 和 1.75%。定性结果进一步表明，RegularFlow 能够有效保持拓扑连续性与边界规整性，并具有较强的跨类别适应能力。本研究为高分辨率遥感影像中规则人造地物的结构化语义分割提供了确定性生成建模视角。代码地址：https://github.com/qwerasdzxhjk/RegularFlow。"
+      }
+    },
+    "acceptanceDate": "2026-10-07"
   }
 ]

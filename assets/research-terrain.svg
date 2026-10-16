@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="560" viewBox="0 0 560 560" fill="none">
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0v28" stroke="#1c5143" stroke-opacity=".08"/>
+    </pattern>
+    <linearGradient id="wash" x1="0" y1="0" x2="560" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ecf0dd"/><stop offset="1" stop-color="#dce7d9"/>
+    </linearGradient>
+  </defs>
+  <rect width="560" height="560" fill="url(#wash)"/>
+  <rect width="560" height="560" fill="url(#grid)"/>
+  <g stroke="#427965" stroke-opacity=".26" stroke-width="1.2">
+    <path d="M-80 124C72-36 143 144 265 69S519-97 618 98S411 245 475 382S647 565 395 641S162 426 32 505S-129 400-30 300S-161 210-80 124Z"/>
+    <path d="M-34 150C82 15 165 168 282 105S473-35 559 120S365 258 429 379S575 525 378 585S177 389 63 460S-71 389 14 298S-117 235-34 150Z"/>
+    <path d="M7 175C97 61 186 193 295 141S433 29 505 143S322 270 383 376S510 487 361 530S191 353 96 414S-18 379 55 296S-74 257 7 175Z"/>
+    <path d="M51 200C112 112 207 213 307 177S389 97 452 165S281 284 338 373S444 446 344 475S204 318 128 369S33 367 98 294S-28 280 51 200Z"/>
+    <path d="M96 225C124 166 232 233 321 213S349 158 396 190S241 299 291 371S380 403 326 421S219 286 163 326S86 356 140 294S15 303 96 225Z"/>
+  </g>
+  <path d="M-16 467L183 269L208 295L589-84" stroke="#fbfcf4" stroke-width="24"/>
+  <path d="M-16 467L183 269L208 295L589-84" stroke="#275744" stroke-opacity=".24" stroke-dasharray="6 9"/>
+  <g transform="rotate(-45 306 280)">
+    <g fill="#235747" fill-opacity=".14" stroke="#2c6652" stroke-width="1.4">
+      <rect x="246" y="121" width="43" height="64"/><rect x="300" y="121" width="29" height="64"/>
+      <rect x="341" y="121" width="59" height="30"/><rect x="341" y="164" width="59" height="53"/>
+      <rect x="244" y="204" width="45" height="88"/><rect x="302" y="204" width="28" height="44"/>
+      <path d="M341 230h59v94h-24v-49h-35Z"/><rect x="302" y="260" width="28" height="32"/>
+      <rect x="246" y="310" width="83" height="38"/><rect x="344" y="342" width="56" height="55"/>
+    </g>
+    <path d="M229 106h184v304H229Z" stroke="#426e58" stroke-opacity=".45" stroke-dasharray="3 5"/>
+  </g>
+  <g stroke="#1e5946" stroke-width="1.2">
+    <path d="M42 76V42h34M484 42h34v34M518 484v34h-34M76 518H42v-34"/>
+    <path d="M268 280h24m-12-12v24"/>
+  </g>
+  <circle cx="280" cy="280" r="28" stroke="#1e5946" stroke-opacity=".4"/>
+  <circle cx="280" cy="280" r="7" fill="#c8df8c" stroke="#1e5946"/>
+  <g fill="#35634f" font-family="monospace" font-size="9" letter-spacing="1.5">
+    <text x="56" y="66">RESEARCH TERRAIN</text>
+    <text x="407" y="497">SCENE / STRUCTURE</text>
+  </g>
+</svg>
