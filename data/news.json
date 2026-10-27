@@ -1,5 +1,15 @@
 [
   {
+    "date": "2026-10-26",
+    "content": "Our paper, BuildFlow, has been accepted by IEEE Transactions on Geoscience and Remote Sensing.",
+    "translations": {
+      "zh": { "content": "我们的论文 BuildFlow 已被 IEEE Transactions on Geoscience and Remote Sensing 接收。" }
+    },
+    "links": [
+      { "text": "GitHub", "url": "https://github.com/qwerasdzxhjk/BuildFlow" }
+    ]
+  },
+  {
     "date": "2026-10-07",
     "content": "Our paper, RegularFlow, has been accepted by IEEE Geoscience and Remote Sensing Letters.",
     "translations": {

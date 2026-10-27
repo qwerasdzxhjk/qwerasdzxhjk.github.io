@@ -89,9 +89,13 @@ Chinese abstract is a translation for the homepage. Chinese text uses installed
 Chinese serif/sans fonts, without downloading an external font or translation
 service. Update both language entries when changing translated content.
 
+The BuildFlow acceptance date is **2026-10-26**, confirmed by the site owner. Its
+TGRS manuscript is not yet linked to a DOI, so the publication title and resource
+button point to the official code repository until publishing metadata is available.
+The citation data includes the complete seven-author list and an `Accepted` note.
 The RegularFlow acceptance date is **2026-10-07**, confirmed by the site owner.
 The separate IEEE online publication date, **2026-10-12**, remains in source data.
-The displayed update announces acceptance and does not say online or Early Access.
+The displayed updates announce acceptance and do not say online or Early Access.
 Publication cards omit the First Author badge and acceptance-date label. Author
 names and journal/year metadata use the same 16px size as the paper title on desktop
 and mobile; the owner's name remains bold. Education date ranges use a more
@@ -152,8 +156,13 @@ modifying the original image. The existing square frame uses top-aligned croppin
 to keep the head visible. The earlier profile artwork remains as an unused asset.
 The RegularFlow figure
 comes from [the official paper repository](https://github.com/qwerasdzxhjk/RegularFlow/blob/main/resource/222.png).
+The BuildFlow figure comes from
+[the official BuildFlow repository](https://github.com/qwerasdzxhjk/BuildFlow/blob/main/resource/main.png).
 The full abstract, author order, DOI, and journal metadata are verified against
 [IEEE Xplore](https://ieeexplore.ieee.org/document/11733487).
+BuildFlow's title, seven-author order, and abstract are verified against the final
+TGRS revision. The local BuildFlow repository README includes Yiping Chen in that
+author list and marks the paper as accepted.
 The ORCID link comes from the IEEE author metadata. The framework figure remains
 the original high-resolution file; allow for its size when planning deployment.
 

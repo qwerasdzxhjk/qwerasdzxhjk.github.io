@@ -125,7 +125,14 @@ if (citationDialog && typeof citationDialog.showModal === 'function') {
         button.hidden = false;
         button.addEventListener('click', () => {
             citationText.textContent = citation.bibtex;
-            document.getElementById('citation-doi').href = citation.doi;
+            const doiLink = document.getElementById('citation-doi');
+            if (citation.doi) {
+                doiLink.href = citation.doi;
+                doiLink.hidden = false;
+            } else {
+                doiLink.removeAttribute('href');
+                doiLink.hidden = true;
+            }
             citationDialog.showModal();
             document.body.classList.add('dialog-open');
         });

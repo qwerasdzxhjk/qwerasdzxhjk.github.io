@@ -38,18 +38,33 @@ export function formatDate(value) {
 
 export function bibtex(pub) {
     const latex = value => String(value).replace(/[\\{}%&#_$]/g, char => `\\${char}`);
-    return `@article{${pub.id},\n  title = {{${latex(pub.title)}}},\n  author = {${pub.authors.map(latex).join(' and ')}},\n  journal = {IEEE Geoscience and Remote Sensing Letters},\n  year = {${pub.year}},\n  doi = {${latex(pub.doi)}}\n}`;
+    const lines = [
+        `@article{${pub.id},`,
+        `  title = {{${latex(pub.title)}}},`,
+        `  author = {${pub.authors.map(latex).join(' and ')}},`,
+        `  journal = {${latex(pub.venueFull || pub.venue)}},`,
+        `  year = {${pub.year}},`,
+    ];
+    if (pub.doi) lines.push(`  doi = {${latex(pub.doi)}},`);
+    if (pub.paperUrl) lines.push(`  url = {${latex(pub.paperUrl)}},`);
+    if (pub.acceptanceDate && !['Published', 'Early Access'].includes(pub.status)) lines.push(`  note = {${latex(pub.status)}},`);
+    lines.push('}');
+    return lines.join('\n');
 }
 
 export function renderPublication(source, name, language = 'en') {
     const pub = localize(source, language);
     const { ui } = locale(language);
     const id = escapeHtml(pub.id);
+    const titleUrl = pub.paperUrl || (pub.doi ? `https://doi.org/${pub.doi}` : '');
+    const title = titleUrl
+        ? `<a href="${safeLink(titleUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(pub.title)}</a>`
+        : escapeHtml(pub.title);
     const authors = pub.authors.map(author => author === name ? `<strong>${escapeHtml(author)}</strong>` : escapeHtml(author)).join(', ');
     const actions = (pub.tags || []).filter(tag => tag.text.toLowerCase() !== 'doi').map(tag => `<a class="paper-link" href="${safeLink(tag.link)}" target="_blank" rel="noopener noreferrer">${icon(tag.text === 'Code' ? 'github' : 'paper')}${escapeHtml(tag.text === 'Code' ? ui.codeAction : tag.text === 'Paper' ? ui.paperAction : tag.text)}</a>`).join('');
-    const figure = pub.thumbnail ? `<figure class="paper-figure"><a class="figure-link" href="${escapeHtml(pub.thumbnail)}" target="_blank" rel="noopener noreferrer" aria-label="${formatText(ui.openFigure, { title: escapeHtml(pub.title) })}"><img src="${escapeHtml(pub.thumbnail)}" alt="${escapeHtml(pub.thumbnailAlt || `Method overview for ${pub.title}`)}" width="13253" height="4475" loading="lazy" decoding="async"><span class="figure-zoom">${icon('expand')}</span></a><figcaption>${escapeHtml(ui.frameworkCaption)} ${icon('expand')}</figcaption></figure>` : '';
+    const figure = pub.thumbnail ? `<figure class="paper-figure"><a class="figure-link" href="${escapeHtml(pub.thumbnail)}" target="_blank" rel="noopener noreferrer" aria-label="${formatText(ui.openFigure, { title: escapeHtml(pub.title) })}"><img src="${escapeHtml(pub.thumbnail)}" alt="${escapeHtml(pub.thumbnailAlt || `Method overview for ${pub.title}`)}" width="${escapeHtml(pub.thumbnailWidth || 13253)}" height="${escapeHtml(pub.thumbnailHeight || 4475)}" loading="lazy" decoding="async"><span class="figure-zoom">${icon('expand')}</span></a><figcaption>${escapeHtml(ui.frameworkCaption)} ${icon('expand')}</figcaption></figure>` : '';
     const abstract = pub.abstract ? `<details class="paper-abstract"><summary class="paper-link">${icon('chevron-right')}${escapeHtml(ui.abstractAction)}</summary><div class="abstract-body"><p>${escapeHtml(pub.abstract)}</p></div></details>` : '';
-    return `<article class="paper-card${figure ? '' : ' no-figure'}" aria-labelledby="title-${id}"><div class="paper-layout">${figure}<div class="paper-content"><p class="paper-meta"><span>${escapeHtml(pub.venue)}</span><span>${escapeHtml(pub.year)}</span></p><h3 class="paper-title" id="title-${id}" lang="en"><a href="${safeLink(`https://doi.org/${pub.doi}`)}" target="_blank" rel="noopener noreferrer">${escapeHtml(pub.title)}</a></h3><p class="paper-authors" lang="en">${authors}</p><div class="paper-actions">${actions}${abstract}<button class="paper-link citation-button" type="button" data-cite="${id}" aria-haspopup="dialog" aria-controls="citation-dialog" hidden>${icon('quote')}${escapeHtml(ui.citeAction)}</button></div></div></div></article>`;
+    return `<article class="paper-card${figure ? '' : ' no-figure'}" aria-labelledby="title-${id}"><div class="paper-layout">${figure}<div class="paper-content"><p class="paper-meta"><span>${escapeHtml(pub.venue)}</span><span>${escapeHtml(pub.year)}</span></p><h3 class="paper-title" id="title-${id}" lang="en">${title}</h3><p class="paper-authors" lang="en">${authors}</p><div class="paper-actions">${actions}${abstract}<button class="paper-link citation-button" type="button" data-cite="${id}" aria-haspopup="dialog" aria-controls="citation-dialog" hidden>${icon('quote')}${escapeHtml(ui.citeAction)}</button></div></div></div></article>`;
 }
 
 export function renderNews(items, language = 'en') {
@@ -101,7 +116,7 @@ async function icons() {
 
 function renderDialog(language) {
     const { ui } = locale(language);
-    return `<dialog id="citation-dialog" class="citation-dialog" aria-labelledby="citation-title"><div class="dialog-header"><h2 id="citation-title">${escapeHtml(ui.citationTitle)}</h2><form method="dialog"><button class="icon-button" aria-label="${escapeHtml(ui.closeCitation)}">${icon('close')}</button></form></div><p class="citation-note">${escapeHtml(ui.citationNote)}</p><pre id="citation-text" lang="en"></pre><div class="dialog-actions"><button id="copy-citation" class="button button-primary" type="button">${icon('copy')}${escapeHtml(ui.copyBibtex)}</button><a id="citation-doi" class="text-link" href="https://doi.org/10.1109/LGRS.2026.3741864" target="_blank" rel="noopener noreferrer">${escapeHtml(ui.viewDoi)} ${icon('external')}</a></div></dialog>`;
+    return `<dialog id="citation-dialog" class="citation-dialog" aria-labelledby="citation-title"><div class="dialog-header"><h2 id="citation-title">${escapeHtml(ui.citationTitle)}</h2><form method="dialog"><button class="icon-button" aria-label="${escapeHtml(ui.closeCitation)}">${icon('close')}</button></form></div><p class="citation-note">${escapeHtml(ui.citationNote)}</p><pre id="citation-text" lang="en"></pre><div class="dialog-actions"><button id="copy-citation" class="button button-primary" type="button">${icon('copy')}${escapeHtml(ui.copyBibtex)}</button><a id="citation-doi" class="text-link" href="https://doi.org/10.1109/LGRS.2026.3741864" target="_blank" rel="noopener noreferrer" hidden>${escapeHtml(ui.viewDoi)} ${icon('external')}</a></div></dialog>`;
 }
 
 function fill(template, values) {
@@ -132,6 +147,8 @@ export async function buildSite() {
         ids.add(pub.id);
         if (!Array.isArray(pub.authors) || !pub.authors.length) throw new Error('Every paper needs authors');
         if (!/^\d{4}$/.test(String(pub.year))) throw new Error(`Invalid publication year: ${pub.year}`);
+        if (!pub.doi && !pub.paperUrl) throw new Error(`Publication ${pub.id} needs a DOI or paper URL`);
+        if (pub.paperUrl) safeLink(pub.paperUrl);
         if (pub.thumbnail) {
             if (!pub.thumbnail.startsWith('assets/') || pub.thumbnail.includes('..')) throw new Error('Paper images must be local assets');
             await access(path.join(root, pub.thumbnail));
@@ -140,7 +157,7 @@ export async function buildSite() {
     const sorted = [...publications].sort((a, b) => Number(b.year) - Number(a.year));
     const selected = sorted.filter(pub => pub.showOnHomepage !== false);
     const orderedNews = [...news].sort((a, b) => b.date.localeCompare(a.date));
-    const citations = Object.fromEntries(publications.map(pub => [pub.id, { bibtex: bibtex(pub), doi: `https://doi.org/${pub.doi}` }]));
+    const citations = Object.fromEntries(publications.map(pub => [pub.id, { bibtex: bibtex(pub), doi: pub.doi ? `https://doi.org/${pub.doi}` : '' }]));
     const nameParts = profile.name.split(' ');
     const sprite = await icons();
     const pages = {};

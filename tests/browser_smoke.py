@@ -11,6 +11,8 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
+PUBLICATIONS = json.loads((ROOT / "data/publications.json").read_text(encoding="utf-8"))
+NEWS = json.loads((ROOT / "data/news.json").read_text(encoding="utf-8"))
 spec = importlib.util.spec_from_file_location("site_server", ROOT / "tools/serve.py")
 site_server = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(site_server)
@@ -80,27 +82,33 @@ def main():
                     for date in page.locator(".education-date").all():
                         assert date.evaluate("element => getComputedStyle(element).fontSize") == "14px", (filename, width)
                 if not filename.startswith("news"):
-                    abstract = page.locator(".paper-abstract")
+                    abstract = page.locator(".paper-abstract").first
                     assert not abstract.locator(".abstract-body").is_visible()
                     abstract.locator("summary").click()
                     assert abstract.get_attribute("open") is not None
                     assert abstract.locator(".abstract-body").is_visible()
-                    assert "2.50%" in abstract.inner_text()
+                    assert "3.41%" in abstract.inner_text()
                     assert_layout(page, 320, "expanded abstract")
                     abstract.locator("summary").click()
                     assert abstract.get_attribute("open") is None
                     assert not abstract.locator(".abstract-body").is_visible()
-                    page.locator("[data-cite]").click()
+                    page.locator("[data-cite]").first.click()
                     assert page.locator("#citation-dialog").is_visible()
-                    assert "10.1109/LGRS.2026.3741864" in page.locator("#citation-text").inner_text()
+                    assert "@article{buildflow2026" in page.locator("#citation-text").inner_text()
+                    assert not page.locator("#citation-doi").is_visible()
                     page.keyboard.press("Escape")
                     assert not page.locator("#citation-dialog").is_visible()
+                    page.locator("[data-cite]").nth(1).click()
+                    assert "10.1109/LGRS.2026.3741864" in page.locator("#citation-text").inner_text()
+                    assert page.locator("#citation-doi").is_visible()
+                    page.keyboard.press("Escape")
                 print(f"PASS page, images, and eleven viewport widths: {filename}", flush=True)
 
             page.goto(f"{base}/index.html", wait_until="load")
             assert not any("/data/" in url for url in requests)
             assert all(url.startswith(base) for url in requests), requests
             assert page.locator("#honors,a[href='#honors']").count() == 0
+            assert page.locator("#news time[datetime='2026-10-26']").count() == 1
             assert page.locator("#news time[datetime='2026-10-07']").count() == 1
             assert page.locator(".paper-card time").count() == 0
             assert "Early Access" not in page.locator("main").inner_text()
@@ -147,9 +155,10 @@ def main():
             assert abs(grids['.paper-layout'][0] / sum(grids['.paper-layout']) - 0.35) < 0.01, grids
             assert page.locator(".file-chrome,.file-dots,.contact-file").count() == 0
             assert page.locator(".paper-summary,.paper-journal").count() == 0
-            assert page.locator(".paper-actions a").all_text_contents() == ["Paper", "Code"]
-            assert "IEEE Geoscience and Remote Sensing Letters" not in page.locator(".paper-card").inner_text()
-            assert page.locator(".paper-actions > .paper-abstract > summary.paper-link").is_visible()
+            assert page.locator(".paper-card").first.locator(".paper-actions a").all_text_contents() == ["Code"]
+            assert page.locator(".paper-card").nth(1).locator(".paper-actions a").all_text_contents() == ["Paper", "Code"]
+            assert "IEEE Geoscience and Remote Sensing Letters" not in page.locator(".paper-card").first.inner_text()
+            assert page.locator(".paper-card").first.locator(".paper-actions > .paper-abstract > summary.paper-link").is_visible()
             assert page.locator(".heading-emoji").all_text_contents() == ["\U0001f525", "\U0001f393", "\U0001f4ec"]
             assert page.locator("#news .title-icon svg,#education .title-icon svg,#contact h2 svg").count() == 0
             assert page.locator(".education-logo").count() == 2
@@ -165,22 +174,22 @@ def main():
                     assert logo_box["x"] + logo_box["width"] < name_box["x"], (logo_box, name_box)
                     assert abs(logo_box["y"] + logo_box["height"] / 2 - name_box["y"] - name_box["height"] / 2) < 1
             assert_layout(page, 1440, "inline abstract row")
-            summary = page.locator(".paper-abstract summary")
+            summary = page.locator(".paper-card").first.locator(".paper-abstract summary")
             summary.scroll_into_view_if_needed()
-            buttons = page.locator(".paper-actions > .paper-link,.paper-abstract > summary")
-            assert buttons.all_text_contents() == ["Paper", "Code", "Abstract", "Cite"]
+            buttons = page.locator(".paper-card").first.locator(".paper-actions > .paper-link,.paper-abstract > summary")
+            assert buttons.all_text_contents() == ["Code", "Abstract", "Cite"]
             before = [item.bounding_box() for item in buttons.all()]
             assert max(box["y"] for box in before) - min(box["y"] for box in before) < 1
             summary.focus()
             page.keyboard.press("Enter")
-            assert page.locator(".abstract-body").is_visible()
+            assert page.locator(".paper-card").first.locator(".abstract-body").is_visible()
             after = [item.bounding_box() for item in buttons.all()]
             assert all(abs(a["y"] - b["y"]) < 1 for a, b in zip(before, after)), (before, after)
-            content_box = page.locator(".abstract-body").bounding_box()
+            content_box = page.locator(".paper-card").first.locator(".abstract-body").bounding_box()
             assert content_box["y"] >= max(box["y"] + box["height"] for box in after)
-            assert abs(content_box["width"] - page.locator(".paper-content").bounding_box()["width"]) < 1
+            assert abs(content_box["width"] - page.locator(".paper-card").first.locator(".paper-content").bounding_box()["width"]) < 1
             page.keyboard.press("Space")
-            assert not page.locator(".abstract-body").is_visible()
+            assert not page.locator(".paper-card").first.locator(".abstract-body").is_visible()
             print("PASS compact publication actions, keyboard abstract, exact heading emoji, and local school crests", flush=True)
             for label in ("Email", "GitHub", "ORCID"):
                 assert page.locator(".social-link", has_text=label).is_visible()
@@ -233,16 +242,16 @@ def main():
             page.locator(".copy-email").click()
             page.wait_for_function("window.__copied === 'liutc@e.gzhu.edu.cn'")
             assert page.locator("#toast").inner_text() == "Email copied to clipboard."
-            page.locator("[data-cite]").click()
+            page.locator("[data-cite]").first.click()
             page.locator("#copy-citation").click()
-            page.wait_for_function("window.__copied.includes('@article{regularflow2026')")
+            page.wait_for_function("window.__copied.includes('@article{buildflow2026')")
             assert page.locator("#citation-dialog #toast").is_visible()
             page.locator("#citation-dialog button[aria-label='Close citation dialog']").click()
             print("PASS clipboard actions without altering the system clipboard", flush=True)
 
             page.goto(f"{base}/index.html", wait_until="load")
             assert_layout(page, 1440, "screenshot desktop")
-            page.locator(".figure-link").scroll_into_view_if_needed()
+            page.locator(".figure-link").first.scroll_into_view_if_needed()
             page.wait_for_function("() => [...document.images].every(i=>i.complete && i.naturalWidth>0)")
             page.evaluate("async () => { await Promise.all([...document.images].map(i=>i.decode())); }")
             page.wait_for_timeout(200)
@@ -270,17 +279,20 @@ def main():
                 "about", "news", "publications", "research", "education", "contact"
             ]
             assert page.locator(".education-item h3").all_text_contents() == ["广州大学", "东北农业大学"]
-            assert page.locator(".paper-actions a").all_text_contents() == ["论文", "代码"]
-            assert page.locator(".paper-abstract summary").inner_text() == "摘要"
-            assert page.locator("[data-cite]").inner_text() == "引用"
+            assert page.locator(".paper-card").first.locator(".paper-actions a").all_text_contents() == ["代码"]
+            assert page.locator(".paper-card").nth(1).locator(".paper-actions a").all_text_contents() == ["论文", "代码"]
+            assert page.locator(".paper-abstract summary").first.inner_text() == "摘要"
+            assert page.locator("[data-cite]").first.inner_text() == "引用"
             assert "2024" in page.locator(".education-date").first.inner_text()
             assert "至今" in page.locator(".education-date").first.inner_text()
-            assert "我们的论文 RegularFlow 已被" in page.locator(".update-content").inner_text()
-            assert "10月7日" in page.locator("#news time").inner_text()
+            news_text = "\n".join(page.locator(".update-content").all_inner_texts())
+            assert "我们的论文 BuildFlow 已被" in news_text
+            assert "我们的论文 RegularFlow 已被" in news_text
+            assert "10月26日" in page.locator("#news time").first.inner_text()
             assert "Office" not in page.locator("#contact").inner_text()
-            page.locator(".paper-abstract summary").click()
-            assert "确定性流匹配框架" in page.locator(".abstract-body").inner_text()
-            page.locator(".paper-abstract summary").click()
+            page.locator(".paper-abstract summary").first.click()
+            assert "确定性条件流匹配框架" in page.locator(".abstract-body").first.inner_text()
+            page.locator(".paper-abstract summary").first.click()
             page.locator("#news .section-heading .text-link").click()
             page.wait_for_url("**/news.zh.html")
             page.locator(".archive-nav a").click()
@@ -304,11 +316,11 @@ def main():
             page.locator(".copy-email").click()
             page.wait_for_function("window.__copied === 'liutc@e.gzhu.edu.cn'")
             assert page.locator("#toast").inner_text() == "邮箱地址已复制。"
-            page.locator("[data-cite]").click()
+            page.locator("[data-cite]").first.click()
             assert page.locator("#citation-title").inner_text() == "引用"
-            assert "@article{regularflow2026" in page.locator("#citation-text").inner_text()
+            assert "@article{buildflow2026" in page.locator("#citation-text").inner_text()
             page.locator("#copy-citation").click()
-            page.wait_for_function("window.__copied.includes('@article{regularflow2026')")
+            page.wait_for_function("window.__copied.includes('@article{buildflow2026')")
             assert page.locator("#citation-dialog #toast").inner_text() == "BibTeX 已复制。"
             page.locator("#citation-dialog button[aria-label='关闭引用窗口']").click()
             print("PASS bilingual switches, preserved anchors, translated biography, menu, archives, abstract, and clipboard", flush=True)
@@ -332,24 +344,24 @@ def main():
             print("PASS legacy archive redirects", flush=True)
 
             page.goto((ROOT / "index.html").as_uri(), wait_until="load")
-            assert page.locator(".update-row").count() == 1
-            assert page.locator(".paper-card").count() == 1
+            assert page.locator(".update-row").count() == len(NEWS)
+            assert page.locator(".paper-card").count() == len(PUBLICATIONS)
             for image in page.locator("img").all():
                 image.scroll_into_view_if_needed()
             page.wait_for_function("() => [...document.images].every(i=>i.complete && i.naturalWidth>0)")
-            page.locator(".paper-abstract summary").click()
-            assert page.locator(".abstract-body").is_visible()
-            page.locator(".paper-abstract summary").click()
-            page.locator("[data-cite]").click()
+            page.locator(".paper-abstract summary").first.click()
+            assert page.locator(".abstract-body").first.is_visible()
+            page.locator(".paper-abstract summary").first.click()
+            page.locator("[data-cite]").first.click()
             assert page.locator("#citation-dialog").is_visible()
             page.keyboard.press("Escape")
             assert_layout(page, 320, "file preview")
             page.locator(".language-switch").click()
             page.wait_for_url("**/index.zh.html")
             assert page.locator("html").get_attribute("lang") == "zh-CN"
-            page.locator(".paper-abstract summary").click()
-            assert "确定性流匹配框架" in page.locator(".abstract-body").inner_text()
-            page.locator("[data-cite]").click()
+            page.locator(".paper-abstract summary").first.click()
+            assert "确定性条件流匹配框架" in page.locator(".abstract-body").first.inner_text()
+            page.locator("[data-cite]").first.click()
             assert page.locator("#citation-title").inner_text() == "引用"
             page.keyboard.press("Escape")
             page.locator("#publications .section-heading .text-link").click()
@@ -362,24 +374,24 @@ def main():
             nojs = browser.new_context(java_script_enabled=False, viewport={"width": 390, "height": 844})
             static = nojs.new_page()
             static.goto(f"{base}/index.html", wait_until="load")
-            assert static.locator(".update-row").count() == 1
-            assert static.locator(".paper-card").count() == 1
+            assert static.locator(".update-row").count() == len(NEWS)
+            assert static.locator(".paper-card").count() == len(PUBLICATIONS)
             assert static.locator("#publications").is_visible()
             assert static.locator("#site-nav").is_visible()
             assert not static.locator(".menu-toggle").is_visible()
-            assert not static.locator(".abstract-body").is_visible()
-            static.locator(".paper-abstract summary").click()
-            assert static.locator(".abstract-body").is_visible()
-            static.locator(".paper-abstract summary").click()
-            assert not static.locator(".abstract-body").is_visible()
-            assert not static.locator("[data-cite]").is_visible()
+            assert static.locator(".abstract-body:visible").count() == 0
+            static.locator(".paper-abstract summary").first.click()
+            assert static.locator(".abstract-body").first.is_visible()
+            static.locator(".paper-abstract summary").first.click()
+            assert not static.locator(".abstract-body").first.is_visible()
+            assert static.locator("[data-cite]:visible").count() == 0
             assert_layout(static, 320, "English no-JS navigation")
             static.locator(".language-switch").click()
             static.wait_for_url("**/index.zh.html")
             assert static.locator("html").get_attribute("lang") == "zh-CN"
             assert "生成式建模" in static.locator("#research").inner_text()
-            static.locator(".paper-abstract summary").click()
-            assert "确定性流匹配框架" in static.locator(".abstract-body").inner_text()
+            static.locator(".paper-abstract summary").first.click()
+            assert "确定性条件流匹配框架" in static.locator(".abstract-body").first.inner_text()
             assert_layout(static, 320, "Chinese no-JS navigation")
             static.locator("#publications .section-heading .text-link").click()
             static.wait_for_url("**/publications.zh.html")

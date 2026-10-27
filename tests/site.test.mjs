@@ -12,6 +12,8 @@ const profile = JSON.parse(await read('data/profile.json'));
 const papers = JSON.parse(await read('data/publications.json'));
 const news = JSON.parse(await read('data/news.json'));
 const translations = JSON.parse(await read('data/i18n.json'));
+const buildflowPaper = papers.find(paper => paper.id === 'buildflow2026');
+const regularflowPaper = papers.find(paper => paper.id === 'regularflow2026');
 
 test('generated pages have valid anchors, unique IDs, and local resources', async () => {
     for (const file of pages) {
@@ -54,17 +56,24 @@ test('legacy archive URLs redirect to the current static pages', async () => {
     }
 });
 
-test('real profile, acceptance date, and publications replace template content', async () => {
+test('real profile, acceptance dates, and publications replace template content', async () => {
     assert.equal(profile.name, 'Taochang Liu');
     assert.equal(profile.email, 'liutc@e.gzhu.edu.cn');
-    assert.equal(papers[0].doi, '10.1109/LGRS.2026.3741864');
-    assert.equal(papers[0].acceptanceDate, '2026-10-07');
-    assert.equal(papers[0].publicationDate, '2026-10-12');
-    assert.equal(news[0].date, '2026-10-07');
+    assert.deepEqual(papers.map(paper => paper.id), ['buildflow2026', 'regularflow2026']);
+    assert.equal(buildflowPaper.acceptanceDate, '2026-10-26');
+    assert.equal(buildflowPaper.authors.at(-2), 'Yiping Chen');
+    assert.equal(buildflowPaper.doi, undefined);
+    assert.equal(buildflowPaper.paperUrl, 'https://github.com/qwerasdzxhjk/BuildFlow');
+    assert.equal(regularflowPaper.doi, '10.1109/LGRS.2026.3741864');
+    assert.equal(regularflowPaper.acceptanceDate, '2026-10-07');
+    assert.equal(regularflowPaper.publicationDate, '2026-10-12');
+    assert.equal(news[0].date, '2026-10-26');
     assert.doesNotMatch(news[0].content, /online|early.?access/i);
     const home = await read('index.html');
     assert.doesNotMatch(home, /Honors|Awards|Early Access|href="#honors"/);
     assert.doesNotMatch(home, /First Author|Accepted <time/);
+    assert.match(home, /BuildFlow, has been accepted by IEEE Transactions on Geoscience and Remote Sensing/);
+    assert.match(home, /<time class="update-date mono" datetime="2026-10-26">/);
     assert.match(home, /<time class="update-date mono" datetime="2026-10-07">/);
     assert.equal(profile.education.length, 2);
 });
@@ -133,10 +142,13 @@ test('six pre-rendered bilingual pages have matching switches, alternate links, 
     assert.match(home, /我们的论文 RegularFlow 已被 IEEE Geoscience and Remote Sensing Letters 接收/);
     assert.match(home, /10月7日<span>2026年<\/span>/);
     assert.doesNotMatch(home, /Office|B3 806|First Author|Early Access/);
-    const chinesePaper = renderPublication(papers[0], profile.name, 'zh');
-    for (const label of ['论文', '代码', '摘要', '引用', '确定性流匹配', '2.50%']) assert.ok(chinesePaper.includes(label));
-    assert.ok(chinesePaper.includes(papers[0].title));
-    assert.doesNotMatch(chinesePaper, /First Author|accepted-date|paper-badge/);
+    const chineseBuildflow = renderPublication(buildflowPaper, profile.name, 'zh');
+    for (const label of ['代码', '摘要', '引用', '确定性条件流匹配', '3.41%']) assert.ok(chineseBuildflow.includes(label));
+    assert.ok(chineseBuildflow.includes(buildflowPaper.title));
+    assert.doesNotMatch(chineseBuildflow, /First Author|accepted-date|paper-badge/);
+    const chineseRegularflow = renderPublication(regularflowPaper, profile.name, 'zh');
+    for (const label of ['论文', '代码', '摘要', '引用', '确定性流匹配', '2.50%']) assert.ok(chineseRegularflow.includes(label));
+    assert.ok(chineseRegularflow.includes(regularflowPaper.title));
     const englishCitation = JSON.parse((await read('publications.html')).match(/id="citation-data" type="application\/json">(.*?)<\/script>/s)[1]);
     const chineseCitation = JSON.parse((await read('publications.zh.html')).match(/id="citation-data" type="application\/json">(.*?)<\/script>/s)[1]);
     assert.deepEqual(chineseCitation, englishCitation);
@@ -197,30 +209,47 @@ test('academic layout avoids terminal chrome and decorative research cards', asy
 
 test('publication actions, full abstract, and citations are accessible', async () => {
     const html = await read('publications.html');
+    assert.match(html, /aria-labelledby="title-buildflow2026"/);
     assert.match(html, /aria-labelledby="title-regularflow2026"/);
     assert.match(html, /aria-haspopup="dialog" aria-controls="citation-dialog"/);
     assert.match(html, /role="status" aria-live="polite"/);
     const embedded = JSON.parse(html.match(/<script id="citation-data" type="application\/json">(.*?)<\/script>/s)[1]);
+    assert.match(embedded.buildflow2026.bibtex, /author = \{Taochang Liu and Xinchang Zhang and Ji Qi and Yongjian Ruan and Linrui Xu and Yiping Chen and Haifeng Li\}/);
+    assert.match(embedded.buildflow2026.bibtex, /journal = \{IEEE Transactions on Geoscience and Remote Sensing\}/);
+    assert.match(embedded.buildflow2026.bibtex, /note = \{Accepted\}/);
+    assert.doesNotMatch(embedded.buildflow2026.bibtex, /doi =/);
+    assert.equal(embedded.buildflow2026.doi, '');
     assert.match(embedded.regularflow2026.bibtex, /author = \{Taochang Liu and Ji Qi and Yibing Xiong and Hui Gong and Xinchang Zhang and Zihan Jiang\}/);
     assert.match(embedded.regularflow2026.bibtex, /10\.1109\/LGRS\.2026\.3741864/);
     assert.match(embedded.regularflow2026.bibtex, /year = \{2026\}/);
     assert.doesNotMatch(embedded.regularflow2026.bibtex, /volume|pages|number =/);
+    assert.match(html, /id="citation-doi"[^>]*hidden/);
 });
 
 test('compact publication cards put Abstract alongside resources and omit redundant text and DOI buttons', async () => {
     for (const filename of ['index.html', 'publications.html']) {
         const html = await read(filename);
-        const card = html.match(/<article class="paper-card"[\s\S]*?<\/article>/)[0];
-        assert.doesNotMatch(card, /paper-journal|paper-summary|IEEE Geoscience and Remote Sensing Letters/);
-        assert.doesNotMatch(card, /paper-badges|paper-badge|accepted-date|First Author|Accepted /);
-        assert.match(card, /<p class="paper-authors" lang="en"><strong>Taochang Liu<\/strong>, Ji Qi, Yibing Xiong, Hui Gong, Xinchang Zhang, Zihan Jiang<\/p>/);
-        assert.doesNotMatch(card, /A deterministic flow-matching approach that combines body and boundary guidance/);
-        assert.doesNotMatch(card, />DOI<\/a>/);
-        assert.match(card, /<div class="paper-actions">[\s\S]*?>Paper<\/a>[\s\S]*?>Code<\/a><details class="paper-abstract"><summary class="paper-link">[\s\S]*?>Abstract<\/summary>/);
-        assert.match(card, /href="#icon-chevron-right"/);
-        assert.match(card, /2\.50%/);
+        const card = id => html.match(new RegExp(`<article class="paper-card"[^>]*aria-labelledby="title-${id}"[\\s\\S]*?<\\/article>`))[0];
+        for (const item of [buildflowPaper, regularflowPaper]) {
+            const publicationCard = card(item.id);
+            assert.doesNotMatch(publicationCard, /paper-journal|paper-summary|paper-badges|paper-badge|accepted-date|First Author|Accepted /);
+            assert.doesNotMatch(publicationCard, />DOI<\/a>/);
+            assert.match(publicationCard, /<div class="paper-actions">/);
+            assert.match(publicationCard, /<details class="paper-abstract"><summary class="paper-link">[\s\S]*?>Abstract<\/summary>/);
+            assert.match(publicationCard, /href="#icon-chevron-right"/);
+        }
+        const buildflowCard = card('buildflow2026');
+        assert.match(buildflowCard, /<p class="paper-authors" lang="en"><strong>Taochang Liu<\/strong>, Xinchang Zhang, Ji Qi, Yongjian Ruan, Linrui Xu, Yiping Chen, Haifeng Li<\/p>/);
+        assert.match(buildflowCard, /href="https:\/\/github\.com\/qwerasdzxhjk\/BuildFlow"[^>]*>[\s\S]*?Code<\/a>/);
+        assert.doesNotMatch(buildflowCard, /paper-summary|A deterministic conditional flow-matching framework/);
+        assert.match(buildflowCard, /3\.41%/);
+        const regularflowCard = card('regularflow2026');
+        assert.match(regularflowCard, /<p class="paper-authors" lang="en"><strong>Taochang Liu<\/strong>, Ji Qi, Yibing Xiong, Hui Gong, Xinchang Zhang, Zihan Jiang<\/p>/);
+        assert.doesNotMatch(regularflowCard, /A deterministic flow-matching approach that combines body and boundary guidance/);
+        assert.match(regularflowCard, />Paper<\/a>[\s\S]*?>Code<\/a><details class="paper-abstract">/);
+        assert.match(regularflowCard, /2\.50%/);
     }
-    const legacy = renderPublication({ ...papers[0], tags: [...papers[0].tags, { text: 'DOI', link: `https://doi.org/${papers[0].doi}` }] }, profile.name);
+    const legacy = renderPublication({ ...regularflowPaper, tags: [...regularflowPaper.tags, { text: 'DOI', link: `https://doi.org/${regularflowPaper.doi}` }] }, profile.name);
     assert.doesNotMatch(legacy, />DOI<\/a>/);
 });
 
@@ -256,7 +285,7 @@ test('dates are validated and news is ordered newest first', () => {
 });
 
 test('publication card remains usable without a figure or abstract', () => {
-    const html = renderPublication({ ...papers[0], thumbnail: '', abstract: '' }, profile.name);
+    const html = renderPublication({ ...regularflowPaper, thumbnail: '', abstract: '' }, profile.name);
     assert.match(html, /paper-card no-figure/);
     assert.doesNotMatch(html, /paper-figure|paper-abstract/);
     assert.match(html, /RegularFlow/);
@@ -268,8 +297,10 @@ test('BibTeX escapes special characters without modifying author order', () => {
     assert.ok(citation.includes('First Author and Second Author'));
 });
 
-test('raster publication figure is complete and original', async () => {
-    const buffer = await readFile(path.join(root, papers[0].thumbnail));
-    assert.equal(buffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
-    assert.equal(buffer.subarray(-12).toString('hex'), '0000000049454e44ae426082');
+test('raster publication figures are complete and original', async () => {
+    for (const paper of papers) {
+        const buffer = await readFile(path.join(root, paper.thumbnail));
+        assert.equal(buffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', paper.id);
+        assert.equal(buffer.subarray(-12).toString('hex'), '0000000049454e44ae426082', paper.id);
+    }
 });

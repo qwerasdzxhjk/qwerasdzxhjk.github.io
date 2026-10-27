@@ -1,5 +1,46 @@
 [
   {
+    "title": "BuildFlow: Rethinking Building Extraction from High-Resolution Remote Sensing Images as Deterministic Continuous Evolution",
+    "authors": [
+      "Taochang Liu",
+      "Xinchang Zhang",
+      "Ji Qi",
+      "Yongjian Ruan",
+      "Linrui Xu",
+      "Yiping Chen",
+      "Haifeng Li"
+    ],
+    "venue": "IEEE TGRS",
+    "venueFull": "IEEE Transactions on Geoscience and Remote Sensing",
+    "type": "journal",
+    "year": "2026",
+    "status": "Accepted",
+    "paperUrl": "https://github.com/qwerasdzxhjk/BuildFlow",
+    "showOnHomepage": true,
+    "highlight": "",
+    "badges": [],
+    "thumbnail": "assets/publications/buildflow.png",
+    "thumbnailAlt": "Overview of the BuildFlow deterministic conditional flow-matching framework for building extraction.",
+    "thumbnailWidth": 1919,
+    "thumbnailHeight": 1080,
+    "summary": "A deterministic conditional flow-matching framework that evolves encoded remote sensing images toward building masks while preserving boundary fidelity and geometric regularity.",
+    "abstract": "Extracting precise building contours from high-resolution remote sensing images (RSIs) is crucial for understanding urban complexity and economic development. Existing methods struggle to balance pixel-wise accuracy with geometric regularity, particularly under complex backgrounds and shadow occlusion. Revisiting this task via input-conditioned continuous transport, our empirical analysis reveals that the image-to-mask transformation is a staged process: texture suppression followed by boundary recovery, where spatial uncertainty progressively concentrates from global regions to local boundaries. Motivated by these observations, we propose BuildFlow, a deterministic conditional flow-matching framework for building extraction. BuildFlow learns an image-conditioned continuous velocity field in the latent space, progressively evolving the encoded input image toward the target mask via an ordinary differential equation (ODE). To adapt to the observed evolution stages and shifting uncertainty, BuildFlow incorporates three tailored designs. Anchor-based alignment establishes initial global structures during the early texture suppression phase. Source feature injection prevents late-stage semantic drift to resolve local boundary uncertainty and aid precise boundary recovery. Additionally, perturbation-resistant learning improves tolerance to trajectory deviations during deterministic integration. Experiments on WHU, WHU-Mix, and VHIR demonstrate that BuildFlow consistently improves pixel-domain boundary fidelity and polygon-level geometric quality while maintaining competitive region-level segmentation accuracy. On the public WHU benchmark, BuildFlow achieves relative improvements of 3.41% in B-IoU and 9.70% in Vertex F1 over the best competing result for each metric. These results show that modeling building extraction as a deterministic continuous evolution process under input conditioning is an effective way to improve contour quality in complex scenes. Code is available at https://github.com/qwerasdzxhjk/BuildFlow.",
+    "tags": [
+      {
+        "text": "Code",
+        "link": "https://github.com/qwerasdzxhjk/BuildFlow"
+      }
+    ],
+    "id": "buildflow2026",
+    "translations": {
+      "zh": {
+        "thumbnailAlt": "BuildFlow 面向建筑提取的确定性条件流匹配框架示意图。",
+        "abstract": "从高分辨率遥感影像中提取精确的建筑轮廓，对于理解城市复杂性和经济发展至关重要。现有方法难以兼顾像素级精度与几何规整性，尤其是在复杂背景和阴影遮挡条件下。本文从输入条件连续传输的视角重新审视该任务，实证分析表明影像到掩膜的变化是一个“纹理抑制、边界恢复”的分阶段过程，空间不确定性逐步从全局区域集中到局部边界。受此启发，我们提出 BuildFlow，一种用于建筑提取的确定性条件流匹配框架。BuildFlow 在潜空间中学习以影像为条件的连续速度场，并通过常微分方程将编码后的输入影像逐步演化至目标掩膜。为适应观测到的演化阶段和不确定性迁移，BuildFlow 引入三项针对性设计：基于锚点的对齐在早期纹理抑制阶段建立初始全局结构；源特征注入防止后期语义漂移，以缓解局部边界不确定性并辅助精确的边界恢复；抗扰动学习提高确定性积分过程中对轨迹偏差的容忍度。在 WHU、WHU-Mix 和 VHIR 上的实验表明，BuildFlow 在保持具有竞争力的区域分割精度的同时，持续提升像素域边界保真度和多边形级几何质量。在公开 WHU 基准上，BuildFlow 的 B-IoU 和 Vertex F1 分别较各项指标的最优对比结果相对提升 3.41% 和 9.70%。结果表明，将建筑提取建模为输入条件下的确定性连续演化过程，是改善复杂场景轮廓质量的有效途径。代码地址：https://github.com/qwerasdzxhjk/BuildFlow。"
+      }
+    },
+    "acceptanceDate": "2026-10-26"
+  },
+  {
     "title": "RegularFlow: A Deterministic Flow-Matching Framework for Segmenting Regular Man-Made Objects in Remote Sensing Images",
     "authors": [
       "Taochang Liu",
@@ -10,6 +51,7 @@
       "Zihan Jiang"
     ],
     "venue": "IEEE GRSL",
+    "venueFull": "IEEE Geoscience and Remote Sensing Letters",
     "type": "journal",
     "year": "2026",
     "publicationDate": "2026-10-12",
@@ -22,6 +64,8 @@
     ],
     "thumbnail": "assets/publications/regularflow.png",
     "thumbnailAlt": "Overview of the RegularFlow deterministic flow-matching framework and its body-boundary collaborative structural constraint.",
+    "thumbnailWidth": 13253,
+    "thumbnailHeight": 4475,
     "summary": "A deterministic flow-matching approach that combines body and boundary guidance for structurally consistent road and building segmentation.",
     "abstract": "Roads, buildings, and other regular man-made objects in high-resolution remote sensing images provide essential cues for urban spatial analysis and updates of fundamental geospatial information. However, existing semantic segmentation methods still struggle to preserve boundary regularity and morphological completeness in complex scenes. To address this problem, this paper proposes RegularFlow, a deterministic flow-matching framework for segmenting regular man-made objects in remote sensing images. RegularFlow models the transformation from a remote sensing image to the target mask as a deterministic transport process in latent space and uses a Diffusion Transformer to learn the conditional velocity field. It further introduces a body-boundary collaborative structural constraint, in which body and boundary structure branches guide feature evolution from the complementary perspectives of region completeness and contour regularity, thereby improving the ability of the model to capture the geometric morphology of regular man-made objects. Experiments on the DeepGlobe road dataset and the HaLoBuilding dataset for building extraction demonstrate that RegularFlow achieves the best BF1 on DeepGlobe, HaLo_H, and HaLo_L and competitive or best performance on the remaining metrics. Compared with the second-best method on each task, RegularFlow achieves relative BF1 improvements of 2.50%, 2.32%, and 3.05% on DeepGlobe, HaLo_H, and HaLo_L, respectively, and relative BIoU improvements of 5.10% and 1.75% on DeepGlobe and HaLo_H. Qualitative results further demonstrate that RegularFlow effectively preserves topological continuity and boundary regularity and exhibits strong cross-category adaptability. This study offers a deterministic generative modeling perspective for structured semantic segmentation of regular man-made objects in high-resolution remote sensing images. Code is available at https://github.com/qwerasdzxhjk/RegularFlow.",
     "tags": [
