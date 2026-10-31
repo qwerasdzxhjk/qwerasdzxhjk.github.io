@@ -50,7 +50,7 @@ old academic homepage in the separate original directory:
   Education, and Contact, with navigation in the same order.
 - Lightweight research lists, dated news, compact figure-led publication cards,
   education entries with authentic school crests, and a plain contact details list.
-- The approved hero/profile arrangement, three research columns, image/text paper
+- The approved hero/profile arrangement, two research columns, image/text paper
   ratio, two-column education/contact layout, and responsive breakpoints stay
   intact. Research Interests follows Publications. Typography may naturally
   change line wrapping.
@@ -89,13 +89,21 @@ Chinese abstract is a translation for the homepage. Chinese text uses installed
 Chinese serif/sans fonts, without downloading an external font or translation
 service. Update both language entries when changing translated content.
 
-The BuildFlow acceptance date is **2026-10-26**, confirmed by the site owner. Its
-TGRS manuscript is not yet linked to a DOI, so the publication title and resource
-button point to the official code repository until publishing metadata is available.
-The citation data includes the complete seven-author list and an `Accepted` note.
+BuildFlow's title and Paper action link to
+[IEEE Xplore](https://ieeexplore.ieee.org/document/11758603), while the separate Code
+action still links to the official repository. The citation includes the complete
+seven-author list and DOI **10.1109/TGRS.2026.3748296**, without the old `Accepted`
+note or unverified volume, issue, or page numbers. The acceptance date,
+**2026-10-26**, remains in source metadata and the original news entry, whose
+resource link now points to IEEE Xplore. No extra publication announcement or
+Early Access label is displayed. Crossref currently provides only the publication
+year; its DOI registration date is not used as the publication date.
 The RegularFlow acceptance date is **2026-10-07**, confirmed by the site owner.
 The separate IEEE online publication date, **2026-10-12**, remains in source data.
-The displayed updates announce acceptance and do not say online or Early Access.
+Its existing acceptance announcement remains unchanged.
+Research Interests lists only Generative Modeling and Remote Sensing in both
+languages, arranged in two desktop columns and one mobile column. The separate
+biography and profile description remain unchanged.
 Publication cards omit the First Author badge and acceptance-date label. Author
 names and journal/year metadata use the same 16px size as the paper title on desktop
 and mobile; the owner's name remains bold. Education date ranges use a more
@@ -161,8 +169,11 @@ The BuildFlow figure comes from
 The full abstract, author order, DOI, and journal metadata are verified against
 [IEEE Xplore](https://ieeexplore.ieee.org/document/11733487).
 BuildFlow's title, seven-author order, and abstract are verified against the final
-TGRS revision. The local BuildFlow repository README includes Yiping Chen in that
-author list and marks the paper as accepted.
+TGRS revision. Its DOI, title, author order, journal, and IEEE document URL are
+verified against the
+[Crossref record](https://api.crossref.org/works/10.1109/TGRS.2026.3748296).
+The official repository README retains the original acceptance notice dated
+26 October 2026.
 The ORCID link comes from the IEEE author metadata. The framework figure remains
 the original high-resolution file; allow for its size when planning deployment.
 

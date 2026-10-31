@@ -104,7 +104,7 @@ h1 em { font-weight: inherit; font-style: normal; color: inherit; }
 .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 22px; }
 .section-heading > .text-link { flex-shrink: 0; color: var(--muted); font-size: 11px; }
 #research { padding-bottom: 25px; }
-.research-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.research-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
 .research-item { padding-top: 12px; border-top: 2px solid #e2e8f0; }
 .research-item h3 { display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 14px; font-weight: 600; line-height: 1.5; }
 .research-item h3 svg { width: 12px; height: 12px; color: var(--accent); }

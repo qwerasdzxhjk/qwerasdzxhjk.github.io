@@ -56,26 +56,76 @@ test('legacy archive URLs redirect to the current static pages', async () => {
     }
 });
 
-test('real profile, acceptance dates, and publications replace template content', async () => {
+test('real profile, publication status, and acceptance history replace template content', async () => {
     assert.equal(profile.name, 'Taochang Liu');
     assert.equal(profile.email, 'liutc@e.gzhu.edu.cn');
     assert.deepEqual(papers.map(paper => paper.id), ['buildflow2026', 'regularflow2026']);
     assert.equal(buildflowPaper.acceptanceDate, '2026-10-26');
     assert.equal(buildflowPaper.authors.at(-2), 'Yiping Chen');
-    assert.equal(buildflowPaper.doi, undefined);
-    assert.equal(buildflowPaper.paperUrl, 'https://github.com/qwerasdzxhjk/BuildFlow');
+    assert.equal(buildflowPaper.status, 'Early Access');
+    assert.equal(buildflowPaper.doi, '10.1109/TGRS.2026.3748296');
+    assert.equal(buildflowPaper.paperUrl, 'https://ieeexplore.ieee.org/document/11758603');
+    assert.deepEqual(buildflowPaper.tags, [
+        { text: 'Paper', link: buildflowPaper.paperUrl },
+        { text: 'Code', link: 'https://github.com/qwerasdzxhjk/BuildFlow' },
+    ]);
     assert.equal(regularflowPaper.doi, '10.1109/LGRS.2026.3741864');
     assert.equal(regularflowPaper.acceptanceDate, '2026-10-07');
     assert.equal(regularflowPaper.publicationDate, '2026-10-12');
+    assert.equal(news.length, 2);
     assert.equal(news[0].date, '2026-10-26');
-    assert.doesNotMatch(news[0].content, /online|early.?access/i);
+    assert.match(news[0].content, /BuildFlow, has been accepted by IEEE Transactions on Geoscience and Remote Sensing/);
+    assert.deepEqual(news[0].links, [{ text: 'IEEE Xplore', url: buildflowPaper.paperUrl }]);
+    assert.equal(news[1].date, '2026-10-07');
+    for (const item of news) assert.doesNotMatch(item.content, /online|early.?access/i);
     const home = await read('index.html');
-    assert.doesNotMatch(home, /Honors|Awards|Early Access|href="#honors"/);
+    assert.doesNotMatch(home, /Honors|Awards|Early Access|2026-10-31|href="#honors"/);
     assert.doesNotMatch(home, /First Author|Accepted <time/);
     assert.match(home, /BuildFlow, has been accepted by IEEE Transactions on Geoscience and Remote Sensing/);
     assert.match(home, /<time class="update-date mono" datetime="2026-10-26">/);
     assert.match(home, /<time class="update-date mono" datetime="2026-10-07">/);
     assert.equal(profile.education.length, 2);
+});
+
+test('BuildFlow paper links and citations are synchronized without adding an Early Access announcement', async () => {
+    for (const filename of pages) {
+        const html = await read(filename);
+        const citations = JSON.parse(html.match(/id="citation-data" type="application\/json">(.*?)<\/script>/s)[1]);
+        assert.equal(citations.buildflow2026.doi, `https://doi.org/${buildflowPaper.doi}`, filename);
+        assert.ok(citations.buildflow2026.bibtex.includes(`doi = {${buildflowPaper.doi}}`), filename);
+        assert.ok(citations.buildflow2026.bibtex.includes(`url = {${buildflowPaper.paperUrl}}`), filename);
+        assert.doesNotMatch(citations.buildflow2026.bibtex, /note = \{Accepted\}|volume|pages|number =/);
+        assert.doesNotMatch(html, /Early Access|2026-10-31/);
+        if (!filename.startsWith('publications')) {
+            const updates = [...html.matchAll(/<article class="update-row">[\s\S]*?<\/article>/g)].map(([row]) => row);
+            assert.equal(updates.length, 2, filename);
+            assert.match(updates[0], /datetime="2026-10-26"/);
+            assert.match(updates[1], /datetime="2026-10-07"/);
+            assert.ok(updates[0].includes(`href="${buildflowPaper.paperUrl}"`), filename);
+            assert.match(updates[0], />IEEE Xplore<svg/);
+            assert.doesNotMatch(updates[0], /GitHub/);
+        }
+        if (!filename.startsWith('news')) {
+            const card = html.match(/<article class="paper-card"[^>]*aria-labelledby="title-buildflow2026"[\s\S]*?<\/article>/)[0];
+            assert.ok(card.includes(`<a href="${buildflowPaper.paperUrl}"`), filename);
+            const paperAction = filename.includes('.zh.') ? '论文' : 'Paper';
+            assert.ok(card.includes(`href="#icon-paper"/></svg>${paperAction}</a>`), filename);
+            assert.doesNotMatch(card, /Accepted|accepted-date|paper-badge/);
+        }
+    }
+});
+
+test('research interests retain only Generative Modeling and Remote Sensing in both languages', async () => {
+    assert.deepEqual(profile.research.map(item => item.title), ['Generative Modeling', 'Remote Sensing']);
+    for (const file of ['index.html', 'index.zh.html']) {
+        const html = await read(file);
+        const research = html.match(/<section id="research"[\s\S]*?<\/section>/)[0];
+        assert.equal((research.match(/class="research-item"/g) || []).length, 2);
+        assert.doesNotMatch(research, /Multimodal Learning|多模态学习/);
+        for (const label of file.includes('.zh.') ? ['生成式建模', '遥感影像分析'] : ['Generative Modeling', 'Remote Sensing']) {
+            assert.ok(research.includes(label), file);
+        }
+    }
 });
 
 test('fonts are local WOFF2 assets with retained licenses', async () => {
@@ -136,14 +186,16 @@ test('six pre-rendered bilingual pages have matching switches, alternate links, 
         }
     }
     const home = await read('index.zh.html');
-    for (const label of ['关于我', '最新动态', '代表论文', '研究方向', '教育经历', '联系方式', '生成式建模', '多模态学习', '广州大学', '东北农业大学', '至今']) assert.ok(home.includes(label));
+    for (const label of ['关于我', '最新动态', '代表论文', '研究方向', '教育经历', '联系方式', '生成式建模', '遥感影像分析', '广州大学', '东北农业大学', '至今']) assert.ok(home.includes(label));
     assert.match(home, /href="news\.zh\.html"/);
     assert.match(home, /href="publications\.zh\.html"/);
     assert.match(home, /我们的论文 RegularFlow 已被 IEEE Geoscience and Remote Sensing Letters 接收/);
     assert.match(home, /10月7日<span>2026年<\/span>/);
     assert.doesNotMatch(home, /Office|B3 806|First Author|Early Access/);
+    assert.match(home, /我们的论文 BuildFlow 已被 IEEE Transactions on Geoscience and Remote Sensing 接收/);
+    assert.match(home, /10月26日<span>2026年<\/span>/);
     const chineseBuildflow = renderPublication(buildflowPaper, profile.name, 'zh');
-    for (const label of ['代码', '摘要', '引用', '确定性条件流匹配', '3.41%']) assert.ok(chineseBuildflow.includes(label));
+    for (const label of ['论文', '代码', '摘要', '引用', '确定性条件流匹配', '3.41%']) assert.ok(chineseBuildflow.includes(label));
     assert.ok(chineseBuildflow.includes(buildflowPaper.title));
     assert.doesNotMatch(chineseBuildflow, /First Author|accepted-date|paper-badge/);
     const chineseRegularflow = renderPublication(regularflowPaper, profile.name, 'zh');
@@ -176,7 +228,7 @@ test('section headings restore the exact old emoji rather than gold SVG substitu
     assert.match(await read('news.html'), /heading-emoji" aria-hidden="true">&#128293;<\/span>News/);
     assert.doesNotMatch(html, /<use href="#icon-(?:news|graduate)"/);
     assert.match(html, /<use href="#icon-lightbulb"/);
-    assert.equal((html.match(/<use href="#icon-star"/g) || []).length, 3);
+    assert.equal((html.match(/<use href="#icon-star"/g) || []).length, 2);
 });
 
 test('old homepage palette and typography replace the green notebook theme', async () => {
@@ -200,7 +252,7 @@ test('academic layout avoids terminal chrome and decorative research cards', asy
     assert.deepEqual(contactLabels, ['Email', 'Profiles']);
     assert.doesNotMatch(contact, /Office|B3 806/);
     assert.match(html, /<div class="profile-backdrop" aria-hidden="true">/);
-    assert.equal((html.match(/class="research-item"/g) || []).length, 3);
+    assert.equal((html.match(/class="research-item"/g) || []).length, 2);
     assert.doesNotMatch(html, /class="paper-summary"/);
     for (const text of ['Email', 'GitHub', 'ORCID']) assert.match(html, new RegExp(`class="social-link"[^>]*>[\\s\\S]*?<\\/svg>${text}<\\/a>`));
     const css = await read('styles.css');
@@ -216,9 +268,10 @@ test('publication actions, full abstract, and citations are accessible', async (
     const embedded = JSON.parse(html.match(/<script id="citation-data" type="application\/json">(.*?)<\/script>/s)[1]);
     assert.match(embedded.buildflow2026.bibtex, /author = \{Taochang Liu and Xinchang Zhang and Ji Qi and Yongjian Ruan and Linrui Xu and Yiping Chen and Haifeng Li\}/);
     assert.match(embedded.buildflow2026.bibtex, /journal = \{IEEE Transactions on Geoscience and Remote Sensing\}/);
-    assert.match(embedded.buildflow2026.bibtex, /note = \{Accepted\}/);
-    assert.doesNotMatch(embedded.buildflow2026.bibtex, /doi =/);
-    assert.equal(embedded.buildflow2026.doi, '');
+    assert.match(embedded.buildflow2026.bibtex, /doi = \{10\.1109\/TGRS\.2026\.3748296\}/);
+    assert.match(embedded.buildflow2026.bibtex, /url = \{https:\/\/ieeexplore\.ieee\.org\/document\/11758603\}/);
+    assert.doesNotMatch(embedded.buildflow2026.bibtex, /note = \{Accepted\}/);
+    assert.equal(embedded.buildflow2026.doi, 'https://doi.org/10.1109/TGRS.2026.3748296');
     assert.match(embedded.regularflow2026.bibtex, /author = \{Taochang Liu and Ji Qi and Yibing Xiong and Hui Gong and Xinchang Zhang and Zihan Jiang\}/);
     assert.match(embedded.regularflow2026.bibtex, /10\.1109\/LGRS\.2026\.3741864/);
     assert.match(embedded.regularflow2026.bibtex, /year = \{2026\}/);
@@ -240,6 +293,8 @@ test('compact publication cards put Abstract alongside resources and omit redund
         }
         const buildflowCard = card('buildflow2026');
         assert.match(buildflowCard, /<p class="paper-authors" lang="en"><strong>Taochang Liu<\/strong>, Xinchang Zhang, Ji Qi, Yongjian Ruan, Linrui Xu, Yiping Chen, Haifeng Li<\/p>/);
+        assert.match(buildflowCard, /href="https:\/\/ieeexplore\.ieee\.org\/document\/11758603"[^>]*>[\s\S]*?Paper<\/a>/);
+        assert.match(buildflowCard, />Paper<\/a>[\s\S]*?>Code<\/a><details class="paper-abstract">/);
         assert.match(buildflowCard, /href="https:\/\/github\.com\/qwerasdzxhjk\/BuildFlow"[^>]*>[\s\S]*?Code<\/a>/);
         assert.doesNotMatch(buildflowCard, /paper-summary|A deterministic conditional flow-matching framework/);
         assert.match(buildflowCard, /3\.41%/);

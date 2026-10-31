@@ -95,7 +95,10 @@ def main():
                     page.locator("[data-cite]").first.click()
                     assert page.locator("#citation-dialog").is_visible()
                     assert "@article{buildflow2026" in page.locator("#citation-text").inner_text()
-                    assert not page.locator("#citation-doi").is_visible()
+                    assert "10.1109/TGRS.2026.3748296" in page.locator("#citation-text").inner_text()
+                    assert "note = {Accepted}" not in page.locator("#citation-text").inner_text()
+                    assert page.locator("#citation-doi").is_visible()
+                    assert page.locator("#citation-doi").get_attribute("href") == "https://doi.org/10.1109/TGRS.2026.3748296"
                     page.keyboard.press("Escape")
                     assert not page.locator("#citation-dialog").is_visible()
                     page.locator("[data-cite]").nth(1).click()
@@ -108,11 +111,15 @@ def main():
             assert not any("/data/" in url for url in requests)
             assert all(url.startswith(base) for url in requests), requests
             assert page.locator("#honors,a[href='#honors']").count() == 0
+            assert page.locator("#news .update-row").count() == 2
+            assert page.locator("#news time[datetime='2026-10-31']").count() == 0
             assert page.locator("#news time[datetime='2026-10-26']").count() == 1
             assert page.locator("#news time[datetime='2026-10-07']").count() == 1
             assert page.locator(".paper-card time").count() == 0
+            assert "BuildFlow, has been accepted by IEEE Transactions on Geoscience and Remote Sensing" in page.locator("#news .update-row").first.inner_text()
             assert "Early Access" not in page.locator("main").inner_text()
-            assert "available online" not in page.locator("main").inner_text()
+            assert page.locator("#news .update-row").first.locator(".update-links a").inner_text() == "IEEE Xplore"
+            assert page.locator("#news .update-row").first.locator(".update-links a").get_attribute("href") == "https://ieeexplore.ieee.org/document/11758603"
             assert page.locator("main h2").evaluate_all("""headings => headings.map(heading => {
                 const label = heading.cloneNode(true);
                 label.querySelectorAll('[aria-hidden="true"]').forEach(icon=>icon.remove());
@@ -149,13 +156,16 @@ def main():
             grids = page.evaluate("""() => Object.fromEntries(['.hero','.research-grid','.paper-layout','.education-list','.contact-layout']
                 .map(selector=>[selector, getComputedStyle(document.querySelector(selector)).gridTemplateColumns.split(' ').map(parseFloat)]))""")
             assert len(grids['.hero']) == 2 and abs(grids['.hero'][1] - 248) < 1, grids
-            assert len(grids['.research-grid']) == 3, grids
+            assert len(grids['.research-grid']) == 2, grids
+            assert page.locator(".research-item h3").all_text_contents() == ["Generative Modeling", "Remote Sensing"]
             assert len(grids['.education-list']) == 2, grids
             assert len(grids['.contact-layout']) == 2, grids
             assert abs(grids['.paper-layout'][0] / sum(grids['.paper-layout']) - 0.35) < 0.01, grids
             assert page.locator(".file-chrome,.file-dots,.contact-file").count() == 0
             assert page.locator(".paper-summary,.paper-journal").count() == 0
-            assert page.locator(".paper-card").first.locator(".paper-actions a").all_text_contents() == ["Code"]
+            assert page.locator(".paper-card").first.locator(".paper-actions a").all_text_contents() == ["Paper", "Code"]
+            assert page.locator(".paper-card").first.locator(".paper-title a").get_attribute("href") == "https://ieeexplore.ieee.org/document/11758603"
+            assert page.locator(".paper-card").first.locator(".paper-actions a").first.get_attribute("href") == "https://ieeexplore.ieee.org/document/11758603"
             assert page.locator(".paper-card").nth(1).locator(".paper-actions a").all_text_contents() == ["Paper", "Code"]
             assert "IEEE Geoscience and Remote Sensing Letters" not in page.locator(".paper-card").first.inner_text()
             assert page.locator(".paper-card").first.locator(".paper-actions > .paper-abstract > summary.paper-link").is_visible()
@@ -177,7 +187,7 @@ def main():
             summary = page.locator(".paper-card").first.locator(".paper-abstract summary")
             summary.scroll_into_view_if_needed()
             buttons = page.locator(".paper-card").first.locator(".paper-actions > .paper-link,.paper-abstract > summary")
-            assert buttons.all_text_contents() == ["Code", "Abstract", "Cite"]
+            assert buttons.all_text_contents() == ["Paper", "Code", "Abstract", "Cite"]
             before = [item.bounding_box() for item in buttons.all()]
             assert max(box["y"] for box in before) - min(box["y"] for box in before) < 1
             summary.focus()
@@ -279,16 +289,18 @@ def main():
                 "about", "news", "publications", "research", "education", "contact"
             ]
             assert page.locator(".education-item h3").all_text_contents() == ["广州大学", "东北农业大学"]
-            assert page.locator(".paper-card").first.locator(".paper-actions a").all_text_contents() == ["代码"]
+            assert page.locator(".paper-card").first.locator(".paper-actions a").all_text_contents() == ["论文", "代码"]
             assert page.locator(".paper-card").nth(1).locator(".paper-actions a").all_text_contents() == ["论文", "代码"]
             assert page.locator(".paper-abstract summary").first.inner_text() == "摘要"
             assert page.locator("[data-cite]").first.inner_text() == "引用"
             assert "2024" in page.locator(".education-date").first.inner_text()
             assert "至今" in page.locator(".education-date").first.inner_text()
             news_text = "\n".join(page.locator(".update-content").all_inner_texts())
+            assert "Early Access" not in news_text
             assert "我们的论文 BuildFlow 已被" in news_text
             assert "我们的论文 RegularFlow 已被" in news_text
             assert "10月26日" in page.locator("#news time").first.inner_text()
+            assert page.locator(".research-item h3").all_text_contents() == ["生成式建模", "遥感影像分析"]
             assert "Office" not in page.locator("#contact").inner_text()
             page.locator(".paper-abstract summary").first.click()
             assert "确定性条件流匹配框架" in page.locator(".abstract-body").first.inner_text()

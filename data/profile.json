@@ -31,12 +31,6 @@
       "translations": { "zh": { "title": "生成式建模", "description": "探索流匹配与扩散模型在图像生成和结构化分割中的应用。" } }
     },
     {
-      "title": "Multimodal Learning",
-      "label": "ALIGN / GENERATE",
-      "description": "Learning from complementary modalities to support image generation and scene understanding.",
-      "translations": { "zh": { "title": "多模态学习", "description": "利用互补模态开展学习，支持图像生成与场景理解。" } }
-    },
-    {
       "title": "Remote Sensing",
       "label": "SCENE / STRUCTURE",
       "description": "Understanding buildings, roads, and other regular man-made objects in high-resolution imagery.",
